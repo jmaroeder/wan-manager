@@ -14,8 +14,9 @@ def main(container: Container = Provide[Container]) -> None:
     log.info("detected %s", isp)
 
 
+container = Container()
+container.wire(modules=[__name__])
+container.init_resources()
+
 if __name__ == "__main__":
-    container = Container()
-    container.wire(modules=[__name__])
-    container.init_resources()
     main()
