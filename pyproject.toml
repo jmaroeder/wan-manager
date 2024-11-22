@@ -36,6 +36,9 @@ ruff = "^0.7.4"
 mypy = "^1.13.0"
 pytest = "^8.3.3"
 
+[tool.poetry.scripts]
+wan-manager = "wan_manager.__main__:main"
+
 [tool.pytest.ini_options]
 testpaths = ["tests/"]
 
