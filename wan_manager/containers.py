@@ -1,24 +1,32 @@
-import logging.config
-
 from dependency_injector import containers, providers
 
-from .isp.isp_detector import IspDetector
-from .isp.starlink import Starlink
-from .isp.zito import Zito
-from .sabnzbd_client import SabnzbdClient
+from wan_manager.clients.http_client import HttpClient, init_client_session
+from wan_manager.dispatcher import Dispatcher
+from wan_manager.resources.logging import Logging
+
+from .clients.sabnzbd_client import SabnzbdClient
+from .detectors.isp_detector import IspDetector
+from .isps.starlink import Starlink
+from .isps.zito import Zito
 
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        packages=[".", ".isp.isp_detector", ".isp.starlink", ".isp.zito"],
+        packages=[".", ".detectors.isp_detector", ".isps.starlink", ".isps.zito"],
     )
 
     config = providers.Configuration(yaml_files=["config.yaml"])
+    logging = providers.Resource(Logging)
+    # logging = providers.Resource(
+    #     logging.basicConfig,
+    #     stream=sys.stdout,
+    #     level=config.log.level,
+    #     format=config.log.format,
+    # )
 
-    logging = providers.Resource(
-        logging.config.fileConfig,
-        fname="logging.ini",
-    )
+    client_session = providers.Resource(init_client_session)
+
+    http_client = providers.Factory(HttpClient)
 
     sabnzbd_client = providers.Singleton(
         SabnzbdClient,
@@ -30,7 +38,7 @@ class Container(containers.DeclarativeContainer):
     zito = providers.Singleton(Zito)
     isps = providers.List(starlink, zito)
 
-    isp_detector = providers.Singleton(
-        IspDetector,
-        # isps=isps,
-    )
+    isp_detector = providers.Singleton(IspDetector)
+    detectors = providers.List(isp_detector)
+
+    dispatcher = providers.Factory(Dispatcher)
