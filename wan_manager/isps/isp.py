@@ -8,12 +8,12 @@ class Isp(ABC):
     pattern: re.Pattern
 
     def __init__(self) -> None:
-        self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.log = logging.getLogger(f"{__name__}:{self.__class__.__name__}")
 
-    def on_connect(self) -> None:
+    async def on_connect(self) -> None:
         self.log.info("Connected to %s", self.name)
 
-    def on_disconnect(self) -> None:
+    async def on_disconnect(self) -> None:
         self.log.info("Disconnected from %s", self.name)
 
     def __str__(self) -> str:

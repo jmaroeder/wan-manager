@@ -1,22 +1,32 @@
+import asyncio
 import logging
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
-from dependency_injector.wiring import Provide, inject
+from dependency_injector.wiring import inject
 
 from .containers import Container
 
 log = logging.getLogger(__name__)
 
 
+@asynccontextmanager
+async def container_context() -> AsyncGenerator[Container]:
+    container = Container()
+    await container.init_resources()
+    yield container
+    await container.shutdown_resources()
+
+
 @inject
-def main(container: Container = Provide[Container]) -> None:
-    isp_detector = container.isp_detector()
-    isp = isp_detector.update_isp()
-    log.info("detected %s", isp)
+async def async_main() -> None:
+    async with container_context() as container:
+        await container.dispatcher().run()
 
 
-container = Container()
-container.wire(modules=[__name__])
-container.init_resources()
+def main() -> None:
+    asyncio.run(async_main())
+
 
 if __name__ == "__main__":
     main()

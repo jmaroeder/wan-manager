@@ -3,7 +3,7 @@ from datetime import time
 
 from dependency_injector.wiring import Provide, inject
 
-from wan_manager.sabnzbd_client import SabnzbdClient
+from wan_manager.clients.sabnzbd_client import SabnzbdClient
 
 from .isp import Isp
 
@@ -21,11 +21,11 @@ class Starlink(Isp):
         super().__init__()
         self.sabnzb_client = sabnzbd_client
 
-    def on_connect(self) -> None:
-        super().on_connect()
-        self.sabnzb_client.resume()
-        self.sabnzb_client.set_schedule(self.offpeak_end, self.offpeak_start)
+    async def on_connect(self) -> None:
+        await super().on_connect()
+        await self.sabnzb_client.resume()
+        await self.sabnzb_client.set_schedule(self.offpeak_end, self.offpeak_start)
 
-    def on_disconnect(self) -> None:
-        super().on_disconnect()
-        self.sabnzb_client.clear_schedule()
+    async def on_disconnect(self) -> None:
+        await super().on_disconnect()
+        await self.sabnzb_client.clear_schedule()
