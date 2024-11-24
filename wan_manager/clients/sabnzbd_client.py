@@ -1,10 +1,13 @@
 import logging
-from collections.abc import Mapping
+from collections.abc import Awaitable, Mapping
 from datetime import time
 from enum import Enum, auto
 from urllib.parse import urljoin
 
-import requests
+from aiohttp import ClientResponse
+from dependency_injector.wiring import Provide, inject
+
+from wan_manager.clients.http_client import HttpClient
 
 
 class Schedline(Enum):
@@ -13,24 +16,33 @@ class Schedline(Enum):
 
 
 class SabnzbdClient:
-    def __init__(self, api_key: str, base_url: str) -> None:
-        self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+    @inject
+    def __init__(
+        self,
+        api_key: str,
+        base_url: str,
+        http_client: HttpClient = Provide["http_client"],
+    ) -> None:
+        self.log = logging.getLogger(f"{__name__}:{self.__class__.__name__}")
         self.api_key = api_key
         self.base_url = base_url
         self.api_url = urljoin(base_url, "/api")
         self.params = {"apikey": api_key, "output": "json"}
+        self.http_client = http_client
 
-    def call(self, **params: Mapping[str, str]) -> requests.Response:
+    async def call(self, **params: Mapping[str, str]) -> Awaitable[ClientResponse]:
         self.log.debug("call(%s)", params)
-        return requests.get(self.api_url, params={**self.params, **params})
+        return await self.http_client.get(
+            self.api_url, params={**self.params, **params}
+        )
 
-    def clear_schedule(self) -> None:
+    async def clear_schedule(self) -> None:
         """Clears any scheduled pause and resume times."""
-        self.call(mode="config", keyword="schedlines", value="")
+        await self.call(mode="config", keyword="schedlines", value="")
 
-    def set_schedule(self, pause_time: time, resume_time: time) -> None:
+    async def set_schedule(self, pause_time: time, resume_time: time) -> None:
         """Schedules pause and resume times for Sabnzbd. Times are in server time, which is UTC."""
-        self.call(
+        await self.call(
             mode="config",
             keyword="schedlines",
             value=",".join(
@@ -41,13 +53,13 @@ class SabnzbdClient:
             ),
         )
 
-    def pause(self) -> None:
+    async def pause(self) -> None:
         """Pauses Sabnzbd."""
-        self.call(mode="pause")
+        await self.call(mode="pause")
 
-    def resume(self) -> None:
+    async def resume(self) -> None:
         """Resumes Sabnzbd."""
-        self.call(mode="resume")
+        await self.call(mode="resume")
 
     @staticmethod
     def build_schedline(d: time, action: str, schedline: Schedline) -> str:

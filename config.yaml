@@ -1,6 +1,8 @@
 log:
   level: "INFO"
   format: "[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s"
+  levels:
+    wan_manager: "DEBUG"
 sabnzbd:
   api_key: "fbd80fbd52eb41e6b40ab6a17e3345a9"
   base_url: "http://localhost:8080/sabnzbd"

@@ -2,7 +2,7 @@ import re
 
 from dependency_injector.wiring import Provide, inject
 
-from wan_manager.sabnzbd_client import SabnzbdClient
+from wan_manager.clients.sabnzbd_client import SabnzbdClient
 
 from .isp import Isp
 
@@ -18,6 +18,6 @@ class Zito(Isp):
         super().__init__()
         self.sabnzb_client = sabnzbd_client
 
-    def on_connect(self) -> None:
-        super().on_connect()
-        self.sabnzb_client.resume()
+    async def on_connect(self) -> None:
+        await super().on_connect()
+        await self.sabnzb_client.resume()
