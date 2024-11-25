@@ -34,7 +34,6 @@ class IspDetector(Detector[Isp]):
             data: Mapping = await response.json()
         self.log.debug(f"Response: {data["isp"]}")
         for isp in self.isps:
-            self.log.debug(f"Checking {isp}")
             if isp.pattern.search(data["isp"]):
                 return isp
         return None

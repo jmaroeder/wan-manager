@@ -31,7 +31,7 @@ class SabnzbdClient:
         self.http_client = http_client
 
     async def call(self, **params: Mapping[str, str]) -> Awaitable[ClientResponse]:
-        self.log.debug("call(%s)", params)
+        self.log.debug("call(mode=%s)", params.get("mode"))
         return await self.http_client.get(
             self.api_url, params={**self.params, **params}
         )

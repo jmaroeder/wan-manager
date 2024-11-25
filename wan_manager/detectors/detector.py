@@ -12,7 +12,7 @@ class Detector[T](ABC):
         self.last_value: T = None
 
     async def run_once(self) -> T:
-        self.log.info("Detecting with %s", self.name)
+        self.log.debug("Detecting with %s", self.name)
         new_value = await self.detect()
         if new_value != self.last_value:
             new_value = await self.on_change(new_value, self.last_value)

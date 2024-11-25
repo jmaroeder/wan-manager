@@ -21,7 +21,7 @@ class Dispatcher:
         self._stopping = False
 
     async def run(self) -> None:
-        self.logger.info("Starting dispatcher")
+        self.logger.debug("Starting dispatcher")
 
         self.detector_tasks = [
             asyncio.create_task(self.run_detector(detector))
@@ -40,11 +40,11 @@ class Dispatcher:
             return
 
         self._stopping = True
-        self.logger.info("Stopping dispatcher")
+        self.logger.debug("Stopping dispatcher")
         for task in self.detector_tasks:
             task.cancel()
         self.detector_tasks.clear()
-        self.logger.info("Dispatcher stopped")
+        self.logger.debug("Dispatcher stopped")
 
     @staticmethod
     async def run_detector(detector: Detector) -> None:
