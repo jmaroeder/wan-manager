@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 from dependency_injector import providers, resources
@@ -10,8 +11,8 @@ class Logging(resources.Resource):
     def init(self, config: providers.Configuration = Provide["config"]) -> None:
         logging.basicConfig(
             stream=sys.stdout,
-            level=config["log"]["level"],
-            format=config["log"]["format"],
+            level=os.getenv("WAN_MANAGER_LOG_LEVEL", config["log"]["level"]),
+            format=os.getenv("WAN_MANAGER_LOG_FORMAT", config["log"]["format"]),
         )
 
         for name, level in config["log"]["levels"].items():

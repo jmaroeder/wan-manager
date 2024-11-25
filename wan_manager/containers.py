@@ -1,3 +1,5 @@
+import os
+
 from dependency_injector import containers, providers
 
 from wan_manager.clients.http_client import HttpClient, init_client_session
@@ -17,12 +19,6 @@ class Container(containers.DeclarativeContainer):
 
     config = providers.Configuration(yaml_files=["config.yaml"])
     logging = providers.Resource(Logging)
-    # logging = providers.Resource(
-    #     logging.basicConfig,
-    #     stream=sys.stdout,
-    #     level=config.log.level,
-    #     format=config.log.format,
-    # )
 
     client_session = providers.Resource(init_client_session)
 
@@ -30,8 +26,8 @@ class Container(containers.DeclarativeContainer):
 
     sabnzbd_client = providers.Singleton(
         SabnzbdClient,
-        api_key=config.sabnzbd.api_key,
-        base_url=config.sabnzbd.base_url,
+        api_key=os.getenv("WAN_MANAGER_SABNZBD_API_KEY", config.sabnzbd.api_key),
+        base_url=os.getenv("WAN_MANAGER_SABNZBD_BASE_URL", config.sabnzbd.base_url),
     )
 
     starlink = providers.Singleton(Starlink)
