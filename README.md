@@ -13,3 +13,25 @@ Tool for monitoring ISP and performing tasks when it switches
    ```shell
    $ poetry run wan-manager
    ```
+
+
+
+# TODO
+
+```shell
+$ sudo apt install build-essential libbluetooth-dev
+$
+```
+
+```shell
+# scan on
+
+[bluetooth]# [NEW] Device 11:75:58:61:7B:04 Pixoo-Max-jmar
+
+# pair 11:75:58:61:7B:04
+
+Attempting to pair with 11:75:58:61:7B:04
+[Pixoo-Max-jmar]# Pairing successful
+```
+
+Ctrl-D to quit

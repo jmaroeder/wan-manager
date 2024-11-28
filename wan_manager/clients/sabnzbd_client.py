@@ -47,8 +47,8 @@ class SabnzbdClient:
             keyword="schedlines",
             value=",".join(
                 [
-                    self.build_schedline(pause_time, "pause"),
-                    self.build_schedline(resume_time, "resume"),
+                    self.build_schedline(pause_time, "pause", Schedline.ENABLED),
+                    self.build_schedline(resume_time, "resume", Schedline.ENABLED),
                 ]
             ),
         )
@@ -62,11 +62,13 @@ class SabnzbdClient:
         await self.call(mode="resume")
 
     @staticmethod
-    def build_schedline(d: time, action: str, schedline: Schedline) -> str:
+    def build_schedline(
+        d: time, action: str, enabled: Schedline = Schedline.ENABLED
+    ) -> str:
         """Builds a schedline for Sabnzbd."""
         return " ".join(
             [
-                "1" if schedline == Schedline.ENABLED else "0",  # enabled
+                "1" if enabled == Schedline.ENABLED else "0",  # enabled
                 f"{d.minute}",  # minute
                 f"{d.hour}",  # hour
                 "1234567",  # days of week
